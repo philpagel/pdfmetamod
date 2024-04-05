@@ -1,21 +1,45 @@
 #!/bin/bash
 # Edit pdf metadata and write to output
 
-if [ $# -ne 2 ]
+OUTFILE=""
+OPTSTRING=":o:"
+while getopts ${OPTSTRING} opt; do
+  case ${opt} in
+    o) 
+        OUTFILE=${OPTARG}
+        ;;
+    :) 
+        echo "Option -${OPTARG} requires an argument."
+        exit 1
+        ;;
+    ?) 
+        echo "Invalid option: -${OPTARG}."
+        exit 1
+        ;;
+    esac
+done
+shift $(($OPTIND-1))
+
+INFILE=${1}
+if [ "${OUTFILE}" = "" ]
+then
+    OUTFILE=${INFILE}
+fi;
+
+if [ $# -ne 1 ]
 then
     echo "Edit pdf metadata and write to output"
     echo
-    echo "    usage: ${0} INFILE.pdf OUTFILE.pdf"
-
+    echo "    usage: ${0} INFILE.pdf [-o OUTFILE.pdf]"
 else
     DUMP=`mktemp -p ./`
-    OUT=`mktemp -p ./`
+    TMPFILE=`mktemp -p ./`
 
-    pdftk "${1}" dump_data output "$DUMP"
-    $EDITOR "$DUMP"
-    pdftk "${1}" update_info "$DUMP"  output "${OUT}"
+    pdftk "${INFILE}" dump_data output "${DUMP}"
+    $EDITOR "${DUMP}"
+    pdftk "${INFILE}" update_info "${DUMP}"  output "${TMPFILE}"
     rm "${DUMP}"
-    touch -r "${1}" "${OUT}"
-    mv "${OUT}" "${2}"
+    touch -r "${INFILE}" "${TMPFILE}"
+    mv "${TMPFILE}" "${OUTFILE}"
 fi;
 
