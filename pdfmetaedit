@@ -1,0 +1,21 @@
+#!/bin/bash
+# Edit pdf metadata and write to output
+
+if [ $# -ne 2 ]
+then
+    echo "Edit pdf metadata and write to output"
+    echo
+    echo "    usage: ${0} INFILE.pdf OUTFILE.pdf"
+
+else
+    DUMP=`mktemp -p ./`
+    OUT=`mktemp -p ./`
+
+    pdftk "${1}" dump_data output "$DUMP"
+    $EDITOR "$DUMP"
+    pdftk "${1}" update_info "$DUMP"  output "${OUT}"
+    rm "${DUMP}"
+    touch -r "${1}" "${OUT}"
+    mv "${OUT}" "${2}"
+fi;
+
