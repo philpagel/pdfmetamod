@@ -30,7 +30,7 @@ if [ $# -ne 1 ]
 then
     echo "Edit pdf metadata and write to output"
     echo
-    echo "    usage: ${0} INFILE.pdf [-o OUTFILE.pdf]"
+    echo "    usage: ${0} [-o OUTFILE.pdf] INFILE.pdf"
 else
     DUMP=`mktemp -p ./`
     TMPFILE=`mktemp -p ./`
